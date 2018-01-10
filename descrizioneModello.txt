@@ -1,0 +1,78 @@
+
+PROBLEMA:
+minimizzazione dello spazio sprecato su N texture atlas per un set di immagini
+
+
+
+NOTAZIONI:
+immagine: risorsa base
+texture: immagine "grande" in cui posizionare le risorse base
+"su a in B": operazione eseguita su/per ogni elemento a appartenente a B
+"su a": operazione eseguita su/per ogni elemento a (l'insieme B è sottinteso)
+IxI: prodotto cartesiano di I per I
+
+
+
+PARAMETRI
+I: set delle immagini i
+IW: set delle lunghezze i
+IH: set delle altezze i
+M=|I| cardinalità di I
+
+T: set delle texture t
+
+SU = SOMMA su i in I ( IW[i] * IH[i] )    è lo spazio utilizzato da tutte le immagini
+
+
+
+VARIABILI
+TW: set delle lunghezze delle texture t
+TH: set delle altezze delle texture t
+
+IT: set che mappa l'immagine i alla texture t
+IX: ascissa dell'immagine i sulla texture IT[i]
+IY: coordinata dell'immagine i sulla texture IT[i]
+
+
+
+F.OBIETTIVO    (quindi COP)
+minimizzazione f = alfa * L + beta * N                     alfa e beta sono dei pesi (da 0.0 a 100.0)
+
+
+
+VINCOLI
+L = ST - SU		spazio libero: totale - utilizzato
+ST = SOMMA su t in T di ( TW[t]*TH[t] )      è lo spazio disponibile delle texture (quelle non usate sono 0*0)
+
+N = max su i (IT[i]) +1                      è il numero di texture utilizzate
+è sempre N<=M (1 texture per immagine se N==M)
+
+per ogni i,j in IxI
+	se IT[i]==IT[j] && i<j
+		// deve esistere un asse su cui i non si sorappone con j: vincolo di non sovrapposizione tra le due immagini 
+		(IX[i]+IW[i] < IX[j] || IX[j]+IW[j] < IX[i] ) ||
+		  (IY[i]+IH[i] < IY[j] || IY[j]+IH[j] < IY[i] ) 
+
+per ogni t,i in TxI t.c. IT[i]=t
+	TW[t] = min su i (IX[i] + IW[i])      larghezza
+	TH[t] = min su i (IY[i] + IH[i])      altezza
+
+
+
+FUNZIONALITÀ AGGIUNTIVE
+volendo il modello si può espandere con delle funzionalità opzionali
+
+1) possiblità di ruotare le immagini di 90 gradi
+2) possibilità di utilizzare solo multipli di 2 per le dimensioni delle texture
+3) possibilità di avere texture di dimensioni identiche o quadrate
+
+3) Possiblità di espansione del modello: 
+F: sottoinsieme di i; sono le immagini con posizione fissa (vincoli aggiuntivi) (questa possibilità mi è venuta in mente pensando a un magazzino che, visto dall'alto, potrebbe essere rapportato a una texture e gli oggetti da inserirvi alle immagini)
+FT: simile a IT, ma preimpostato dai parametri
+FX: ...
+FY: ...
+
+
+simmetria tra img X img
+
+simmetria nel "quale" texture usare (---> la più piccola? (indice? spazio libero?))--> t è solo un n° !!!

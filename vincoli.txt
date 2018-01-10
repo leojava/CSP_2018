@@ -1,0 +1,38 @@
+
+ALLDIFFERENT(vars)						#All Different
+GCC(vars, vals, lows, ups)				#Global Cardinality Constraint;		forEach v in vals: Lv, Uv
+DISTRIBUTE(vars, vals, cardinalityVars)	#	cardVars VS lowUpVals
+COUNT(vars, val, c)						#: c is n° of occurrence of val in vars
+ATMOST(vars, val, c)					# satisfied if v is taken <= c times in X
+ALLDIFFERENTEXCEPT(vars, val)			#All Different, but val can be taen multiple times (eg: empty slots)
+SUM(var,vars)							# var = sum of vars
+ELEMENT(out,vars,index)					# out = vars[index]
+MIN(out,vars)
+MAX(out,vars)
+TABLE(vars, tuples)						# tuples are the valid assignments (combination of vals) for vars 
+
+CUMULATIVE(starts, durs, reqs, c)		# durs, req: const|intVar
+
+CIRCUIT(nodes)							# (id,succ): 1->2->4->3->5->1
+REGULAR(vars, trans, initial,finals)	# sequence of vars as a DetereministicFiniteAutomata
+										# trans: transitions from state to state: (Scur,V,Snext), finals is {} of accepting states
+										# all transitions HAVE to be valid AND the DFA HAS tobe in an accepting state
+
+
+
+
+X: list of vars
+z: implicit var
+
+slv.AllDifferent(X)
+slv.AllDifferentExcept(X,v)
+slv.Distribute(X,V,C)
+slv.Count(X,v,c)
+slv.AtMost(X,v,u)
+
+z = slv.Min(X)
+z = slv.Max(X)
+z = slv.Sum(X)
+z = var.IndexOf(V)		# z = V[var]
+
+slv.TransitionConstraint(X,T,s0,F)	# T: matrix w/ allowed transitions, F: list of final states

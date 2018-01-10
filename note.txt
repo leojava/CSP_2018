@@ -1,0 +1,50 @@
+
+vincoli globali generalmente più efficienti
+
+ottimizzazione:
+	rimuovere le soluzioni "simmetriche"  (come variabili e valori)
+	adjusting domain representation
+
+	dominance rule .... ??  ---> non "sprecare" risorse nei domini (tipo fare + prodotti del necessario)
+
+	redundant constraint may improve propagation (does not change the solution space)
+
+	incremental computation --> cache
+
+--->Model reformulation
+	Static symmetry breaking
+	Lex-Leader ----> adding a lexicographic ordering constraint:  (x1,y1) < (x2,y2)
+
+
+
+
+
+
+	search
+	pruning: act of removing values
+	filtering: process that guides pruning
+	propagation: process by which filtering from one constraint may enable filtering from another constraint
+
+
+
+	CP = model + constraint reasoning + search
+
+	CSP=(vars, domainsOfEachVars, ConstraintsOverVarsAndDomains)
+	COP=(vars, domainsOfEachVars, ConstraintsOverVarsAndDomains, objectiveFunction)
+
+
+	meta-constraint
+	reified constraint
+
+	Boolean Satisfiability problem
+
+	heuristics
+	likeliness of feasibility
+
+first-fail principle
+
+
+Choose a variable that is likely to cause a fail, choose a value that is likely to be feasible
+
+Choose variables and values that are likely tipoyield high-quality solutions
+

@@ -1,3 +1,31 @@
 {
-  "boh": "meh"
+  "//cose":"" ,
+  "images" : [
+    {
+      "id": "optional",
+      "w": 50,
+      "h": 50
+    },
+    {
+      "w": 50,
+      "h": 50
+    }
+  ],
+  "options" : {
+    "spaceWeight": 1.0,
+    "numberWeight": 1.0,
+    "rotationAllowed" : false,
+    "powOf2Only": true,
+    "oneWidthHeightForTextures" : true,
+    "squaredTextures" : false
+  },
+  "// fixedImages viene poi clashato con images" : "",
+  "fixedImages" : [
+    {
+      "id": "optional1",
+      "t" : 0,
+      "x" : 0,
+      "y" : 0
+    }
+  ]
 }
