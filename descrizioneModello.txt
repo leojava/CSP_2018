@@ -18,6 +18,7 @@ I: set delle immagini i
 IW: set delle lunghezze i
 IH: set delle altezze i
 M=|I| cardinalità di I
+alfa, beta : parametri dell f.obiettivo
 
 T: set delle texture t
 
@@ -36,12 +37,12 @@ IY: coordinata dell'immagine i sulla texture IT[i]
 
 
 F.OBIETTIVO    (quindi COP)
-minimizzazione f = alfa * L + beta * N                     alfa e beta sono dei pesi (da 0.0 a 100.0)
-
+minimizzazione f = alfa * L + beta * N                     alfa e beta sono dei pesi (da 0 a 10000)
+														# tendono a crescere sia L che N, quindi va bene il vincolo e sarà sempre >=0
 
 
 VINCOLI
-L = ST - SU		spazio libero: totale - utilizzato
+L = ST - SU		spazio libero: totale - utilizzato (semre >=0)
 ST = SOMMA su t in T di ( TW[t]*TH[t] )      è lo spazio disponibile delle texture (quelle non usate sono 0*0)
 
 N = max su i (IT[i]) +1                      è il numero di texture utilizzate
@@ -53,9 +54,15 @@ per ogni i,j in IxI
 		(IX[i]+IW[i] < IX[j] || IX[j]+IW[j] < IX[i] ) ||
 		  (IY[i]+IH[i] < IY[j] || IY[j]+IH[j] < IY[i] ) 
 
-per ogni t,i in TxI t.c. IT[i]=t
-	TW[t] = min su i (IX[i] + IW[i])      larghezza
+per ogni t in T                            #t.c. IT[i]=t
+	TW[t] = max su i ( 0*bigM*(1-(t==IT[i])+ (t==IT[i])*(IX[i] + IW[i]))      larghezza			/!\
 	TH[t] = min su i (IY[i] + IH[i])      altezza
+
+
+z = var.IndexOf(V)		# z = V[var]
+	
+	TW
+
 
 
 

@@ -7,5 +7,9 @@ SLIDES intro pyton
 http://www.lia.disi.unibo.it/Staff/MicheleLombardi/SV1617/lectures/lab1.html#/30
 
 
-google or-tools
-https://developers.google.com/optimization/
+ ## google or-tools
+> https://developers.google.com/optimization/
+
+
+# Global Constraint Catalog
+http://sofdem.github.io/gccat/gccat/sec5.html
