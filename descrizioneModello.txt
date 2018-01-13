@@ -48,14 +48,12 @@ ST = SOMMA su t in T di ( TW[t]*TH[t] )      è lo spazio disponibile delle text
 N = max su i (IT[i]) +1                      è il numero di texture utilizzate
 è sempre N<=M (1 texture per immagine se N==M)
 
-per ogni i,j in IxI
-	se IT[i]==IT[j] && i<j
-		// deve esistere un asse su cui i non si sorappone con j: vincolo di non sovrapposizione tra le due immagini 
-		(IX[i]+IW[i] < IX[j] || IX[j]+IW[j] < IX[i] ) ||
-		  (IY[i]+IH[i] < IY[j] || IY[j]+IH[j] < IY[i] ) 
+per ogni i,j in IxI, i<j
+    // se stessa t, deve esistere un asse su cui i non si sorappone con j: vincolo di non sovrapposizione tra le due immagini 
+    IT[i]==IT[j] =>  ( (IX[i]+IW[i] < IX[j] || IX[j]+IW[j] < IX[i] ) || (IY[i]+IH[i] < IY[j] || IY[j]+IH[j] < IY[i] ) )
 
 per ogni t in T                            #t.c. IT[i]=t
-	TW[t] = max su i ( 0*bigM*(1-(t==IT[i])+ (t==IT[i])*(IX[i] + IW[i]))      larghezza			/!\
+	TW[t] = max su i ( (t==IT[i])*(IX([i] + IW[i])))      larghezza			/!\
 	TH[t] = min su i (IY[i] + IH[i])      altezza
 
 
