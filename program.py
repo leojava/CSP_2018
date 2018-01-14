@@ -265,8 +265,8 @@ def pMain ():
 			#sol+=','.join(map(getVal, IH ))+'\n'
 			#sol+=','.join(map(str, IH))+'\n'
 			print('sol:{\n%s}\n' %sol)
-			with open((args[1] if len(args)>1 else '')+".out", "w") as text_file:
-			    print('sol'), file=text_file)
+			with open((sys.argv[1] if len(sys.argv)>1 else '')+".out", "w") as text_file:
+			    print('%s' % sol, file=text_file)
 		count+=1
 
 	print()
