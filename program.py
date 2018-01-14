@@ -1,6 +1,11 @@
 #!/usr/bin/python3.6
 
 #
+# usage: python program.py [dataFile]
+#
+
+
+#
 # IMPORT THE OR-TOOLS CONSTRAINT SOLVER
 #
 from ortools.constraint_solver import pywrapcp
@@ -13,6 +18,13 @@ def clamp(val: int, minimum: int, maximum: int ):
 	#if minimum>maximum: print('errore in clamp, min>max!!')
 	return max(min(val, maximum), minimum)
 
+def delComments( d ):
+	keys = list(d.keys())
+	for k in keys:
+		if k.find("//") == 0:
+			del d[k]
+		elif type(d[k]) is dict :
+			delComments(d[k])
 
 
 def pMain ():
@@ -25,26 +37,17 @@ def pMain ():
 		with open(fname) as f: # "f" = file object
 			data = json.load(f) # read and parse JSON data
 
-	#print (data['options'],type(data))
-
-
 	#
 	# CREATE A SOLVER INSTANCE
 	# Signature: Solver(<solver name>)
 	slv = pywrapcp.Solver('simple-example')
-
-
-	'''def getNVar( isFixedNum: bool, constMaxN: int, constM: int):
-		if(isFixedNum):	N = slv.IntVar([constMaxN], 'N')
-		else:			N = slv.IntVar(1, constM, 'N')		# 1<=N<=M
-		return N;'''
 
 	def getNVar( N: int, constMaxN: int):
 		if(N>0):	N = slv.IntVar([N], 'N')
 		else:			N = slv.IntVar(1, constMaxN, 'N')		# 1<=N<=M
 		return N;
 
-	# 0 vuol dire che l'immagine NON ha area!
+	# 0 vorrebbe dire che l'immagine NON ha area!
 	def getTextureDims(maxDimension: int, name: str, powOf2: bool, setT):
 		if(powOf2):
 			pows = [2**i for i in range(math.ceil(math.log2(maxDimension)))]	# da 2**0 a 2**N
@@ -55,6 +58,8 @@ def pMain ():
 	# CREATE VARIABLES
 	# Signature: IntVar(<min>, <max>, [<name>])
 	# Alternative signature: IntVar(<domain as a list>, [<name>])
+	delComments(data);
+	print(json.dumps(data, indent=2));
 
 	images = data['images']		# HAS to exist
 	options = data['options']	# HAS to exist
@@ -66,7 +71,8 @@ def pMain ():
 
 
 	constM  = len(images)
-	constMaxN = clamp(int(textureOptions.get('maxNumber', constM)), 1, constM)
+	#il massimo N è maxNumber oppure number oppure constM (len(images))
+	constMaxN = clamp(int(textureOptions.get('number', textureOptions.get('maxNumber', constM))), 1, constM)
 
 	setI = range(constM)
 	setT = range(constMaxN)
@@ -85,14 +91,14 @@ def pMain ():
 	constMaxFreeSpace = constMaxPossibleArea - constSU;
 	constMaxInt = sys.maxsize*0 + 5000000
 
-	I      = [ slv.IntVar([ i ], 'I%d' % i) for i in setI ]
-	T      = [ slv.IntVar([ t ], 'T%d' % t) for t in setT ]
-	IW     = [ slv.IntVar([ w ], 'IW%d' % i) for i,w in enumerate(paramsW) ]
-	IH     = [ slv.IntVar([ h ], 'IH%d' % i) for i,h in enumerate(paramsH) ] # '''enumerate(paramsH)''' ]
-	M      = slv.IntVar([ constM ], 'M')
-	SU     = slv.IntVar([ constSU ], 'SU')
-	alfa   = slv.IntVar([ paramAlfa ], 'alfa')
-	beta   = slv.IntVar([ paramBeta ], 'beta')
+	I      = setI # [ slv.IntVar([ i ], 'I%d' % i) for i in setI ]
+	T      = setT #[ slv.IntVar([ t ], 'T%d' % t) for t in setT ]
+	IW     = paramsW #[ slv.IntVar([ w ], 'IW%d' % i) for i,w in enumerate(paramsW) ]
+	IH     = paramsH #[ slv.IntVar([ h ], 'IH%d' % i) for i,h in enumerate(paramsH) ] # '''enumerate(paramsH)''' ]
+	M      = constM # slv.IntVar([ constM ], 'M')
+	SU     = constSU # slv.IntVar([ constSU ], 'SU')
+	alfa   = paramAlfa # slv.IntVar([ paramAlfa ], 'alfa')
+	beta   = paramBeta # slv.IntVar([ paramBeta ], 'beta')
 	#maxInt = slv.IntVar([ constMaxInt ], 'maxInt')
 
 
@@ -100,7 +106,7 @@ def pMain ():
 
 	# N: se number -> numero fisso; altrimenti maxNumber se presente o constM (UB)
 	#N = getNVar('number' in textureOptions, constMaxN, (textureOptions.get('maxNumber', constM)));
-	N = getNVar(clamp(int(textureOptions.get('number', 0)), 0, constMaxN), constMaxN);
+	N = getNVar(clamp(int(textureOptions.get('number', 0)), 1, constMaxN), constMaxN);
 
 	# al massimo 1 texture per image => 0<=id<=M-1
 	IT = [slv.IntVar(0, constMaxN-1, 'IT%d' % i) for i in setI]
@@ -108,20 +114,19 @@ def pMain ():
 	IY = [slv.IntVar(0, constMaxDimensionSum-paramsH[i], 'IY%d' % i) for i in setI]		# in ogni caso si toglie la dimensione ???
 
 
-	if 'squared' in textureOptions:
-		TW = getTextureDims(constMaxDimensionSum, 'TW', ('dimsPowOf2' in textureOptions), setT)
-		TH = getTextureDims(constMaxDimensionSum, 'TH', ('dimsPowOf2' in textureOptions), setT)
+	if textureOptions.get('squared', False) == True:
+		TW = getTextureDims(constMaxDimensionSum, 'TW', (textureOptions.get('dimsPowOf2', False)==True), setT)
+		TH = getTextureDims(constMaxDimensionSum, 'TH', (textureOptions.get('dimsPowOf2', False)==True), setT)
 	else:
-		TW = getTextureDims(constWidthSum, 'TW', ('dimsPowOf2' in textureOptions), setT)
-		TH = getTextureDims(constHeightSum, 'TH', ('dimsPowOf2' in textureOptions), setT)
+		TW = getTextureDims(constWidthSum, 'TW', (textureOptions.get('dimsPowOf2', False)), setT)
+		TH = getTextureDims(constHeightSum, 'TH', (textureOptions.get('dimsPowOf2', False)), setT)
 
 	# maxST = massimo spazio totale possibile
-	ST = slv.IntVar(0, constMaxPossibleArea, "ST")
+	ST = slv.IntVar(1, constMaxPossibleArea, "ST")
 	# maxL: maxST-constSU
 	L = slv.IntVar(0, constMaxFreeSpace, "L")
 
-	''' 0 < f <= alfa* maxL + beta*M'''
-	print('hey', paramAlfa*constMaxInt+paramBeta*constMaxN)
+	print('maxF: ', paramAlfa*constMaxFreeSpace+paramBeta*constMaxN)
 	f = slv.IntVar(0, (paramAlfa*constMaxFreeSpace+paramBeta*constMaxN), "f")
 
 
@@ -141,7 +146,7 @@ def pMain ():
 		# for each t: if t>=N => tw=0 ^ th=0		(if not used, each dimension IS 0)
 		slv.Add( ( T[t] >=N ) <= ( (TW[t]==0)*(TH[t]==0) ))
 
-		# for each t: TW[t]=Max = Max IX[i]+IW[i] for each i, if IT[i]==t 
+		# for each t: TW[t] = Max IX[i]+IW[i] for each i, if IT[i]==t 
 		slv.Add( TW[t] == slv.Max( [ (IT[i]==t)*(IX[i]+IW[i]) for i in setI] ))
 		slv.Add( TH[t] == slv.Max( [ (IT[i]==t)*(IY[i]+IH[i]) for i in setI] ))
 		# if options->squared textures 
@@ -156,6 +161,10 @@ def pMain ():
 												# < oppure <= ????  (se t=t, almeno un asse non deve sovrapporsi: uno dei due inisce prima dell'altro)
 				slv.Add( (IT[i]==IT[j]) <= ( slv.Max( [	(IX[i]+IW[i] < IX[j] ) , ( IX[j]+IW[j] < IX[i])	,
 														(IY[i]+IH[i] < IY[j] ) , ( IY[j]+IH[j] < IY[i])	]	) ) )
+				# togliamo un po' di simmetrie sulle immagini identiche
+				if(paramsH[i]==paramsH[j] and paramsW[i]==paramsW[j]):
+					slv.Add( (IT[i]== IT[j] ) <= ((IX[i]<=IX[j])*(IY[i]<=IY[j])) )	# stessa texture => i prima di j su XY
+					slv.Add( IT[i] <= IT[j] ) 	#texture diversa => i prima di j su T
 
 	#optional constraints
 	#squared textures
@@ -168,7 +177,9 @@ def pMain ():
 	# we will keep this fixed for a few more lectures
 	#
 	#all_vars = [x1, x2, x3]
-	all_vars = I + T + IW + IH + IT + IX + IY + TW + TH + [ M, f, alfa, L, beta, N, ST, SU] #, maxInt];
+	all_vars = (
+		#I + T +
+	  IT + IX + IY + TW + TH + [ f, L, N, ST, ]) 
 	#DFS (?) Depth First Search
 	#decision_builder = slv.Phase(all_vars, slv.INT_VAR_DEFAULT, slv.INT_VALUE_DEFAULT)
 
@@ -231,23 +242,31 @@ def pMain ():
 			print()
 			print('solution %d: ' % count)
 			print('variables: ', [ v for v in all_vars if v.Value() != 0])
-			print('f: %f' % (f.Value()*1.0/((paramAlfa+paramBeta)/2.0)))
-			print('space:\ttotal: %d\t free: %d\t used: %d\nn° of textures: %d' % (ST.Value(), L.Value(), SU.Value(), N.Value()))
+			print('f: %f' % (f.Value()+0*1.0/((paramAlfa+paramBeta)/2.0)))
+			#print('space:\ttotal: %d\t free: %d\t used: %d\nn° of textures: %d' % (ST.Value(), L.Value(), SU.Value(), N.Value()))
+			print('space:\ttotal: %d\t free: %d\t used: %d\nn° of textures: %d' % (ST.Value(), L.Value(), SU, N.Value()))
 			for t in setT:
 				if t < N: print('T %d : %d X %d' % (t, TW[t].Value(), TH[t].Value()))
 			for i in setI:
-				print('I %d : %d in %d,%d [%d x %d]' % (i, IT[i].Value(), IX[i].Value(), IY[i].Value(), IW[i].Value(), IH[i].Value()))
+				#print('I %d : in t%d at %d,%d [%d x %d]' % (i, IT[i].Value(), IX[i].Value(), IY[i].Value(), IW[i].Value(), IH[i].Value()))
+				print('I %d : in t%d at %d,%d [%d x %d]' % (i, IT[i].Value(), IX[i].Value(), IY[i].Value(), IW[i], IH[i]))
 			sol+=str(N.Value())+'\n'
 			def getVal(x): return str(x.Value());
-			sol+=','.join(map(getVal, TW ))+'\n'
-			sol+=','.join(map(getVal, TH ))+'\n'
+			sol+='\n'.join( '%d,%d' % (TW[t].Value(),TW[t].Value()) for t in setT)+'\n'
+			#sol+=','.join(map(getVal, TW ))+'\n'
+			#sol+=','.join(map(getVal, TH ))+'\n'
 			sol+=str(constM)+'\n';
-			sol+=','.join(map(getVal, IT ))+'\n'
-			sol+=','.join(map(getVal, IX ))+'\n'
-			sol+=','.join(map(getVal, IY ))+'\n'
-			sol+=','.join(map(getVal, IW ))+'\n'
-			sol+=','.join(map(getVal, IH ))+'\n'
+			sol+='\n'.join( '%d,%d,%d,%d,%d'% (IT[i].Value(),IX[i].Value(),IY[i].Value(),IW[i],IH[i]) for i in setI)+'\n'
+			#sol+=','.join(map(getVal, IT ))+'\n'
+			#sol+=','.join(map(getVal, IX ))+'\n'
+			#sol+=','.join(map(getVal, IY ))+'\n'
+			#sol+=','.join(map(getVal, IW ))+'\n'
+			#sol+=','.join(map(str, IW))+'\n'
+			#sol+=','.join(map(getVal, IH ))+'\n'
+			#sol+=','.join(map(str, IH))+'\n'
 			print('sol:{\n%s}\n' %sol)
+			with open((args[1] if len(args)>1 else '')+".out", "w") as text_file:
+			    print('sol'), file=text_file)
 		count+=1
 
 	print()

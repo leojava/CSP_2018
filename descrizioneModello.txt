@@ -27,6 +27,7 @@ SU = SOMMA su i in I ( IW[i] * IH[i] )    è lo spazio utilizzato da tutte le im
 
 
 VARIABILI
+	(se dimensioni multiple di 2, i domini di TW e TH sono ridotti a 2**i (fino all'i più piccolo, ma sufficientemente grande))
 TW: set delle lunghezze delle texture t
 TH: set delle altezze delle texture t
 
@@ -48,36 +49,36 @@ ST = SOMMA su t in T di ( TW[t]*TH[t] )      è lo spazio disponibile delle text
 N = max su i (IT[i]) +1                      è il numero di texture utilizzate
 è sempre N<=M (1 texture per immagine se N==M)
 
-per ogni i,j in IxI, i<j
+per ogni i,j in IxI, i<j   (i==j sarà sempre falso, mentre i>j è una ripetizione (simmetria di variabili))
     // se stessa t, deve esistere un asse su cui i non si sorappone con j: vincolo di non sovrapposizione tra le due immagini 
     IT[i]==IT[j] =>  ( (IX[i]+IW[i] < IX[j] || IX[j]+IW[j] < IX[i] ) || (IY[i]+IH[i] < IY[j] || IY[j]+IH[j] < IY[i] ) )
 
 per ogni t in T                            #t.c. IT[i]=t
 	TW[t] = max su i ( (t==IT[i])*(IX([i] + IW[i])))      larghezza			/!\
-	TH[t] = min su i (IY[i] + IH[i])      altezza
+	TH[t] = max su i ( (t==IT[i])*(IY([i] + IH[i])))      altezza			/!\
+	(se texture quadrate :)
+		[aggiungi vincolo] TW[t]=TH[t]
 
 
-z = var.IndexOf(V)		# z = V[var]
-	
-	TW
-
-
+2) possibilità di utilizzare solo multipli di 2 per le dimensioni delle texture
+3) possibilità di avere texture di dimensioni identiche o quadrate
 
 
 FUNZIONALITÀ AGGIUNTIVE
 volendo il modello si può espandere con delle funzionalità opzionali
 
 1) possiblità di ruotare le immagini di 90 gradi
-2) possibilità di utilizzare solo multipli di 2 per le dimensioni delle texture
-3) possibilità di avere texture di dimensioni identiche o quadrate
-
-3) Possiblità di espansione del modello: 
-F: sottoinsieme di i; sono le immagini con posizione fissa (vincoli aggiuntivi) (questa possibilità mi è venuta in mente pensando a un magazzino che, visto dall'alto, potrebbe essere rapportato a una texture e gli oggetti da inserirvi alle immagini)
-FT: simile a IT, ma preimpostato dai parametri
-FX: ...
-FY: ...
 
 
-simmetria tra img X img
+simmetrie:
+	tra img X img : sul vincolo di non sovrapposizione, basta farlo per le sole i<j
+
+	simmetria "nella" texture: una soluzione può essere specchiata verticalmente e orizzontalmente
+	nel romperla: si riduce a 1/4 l'insieme delle soluzioni (togliendo 3/4 di soluzioni "ridondanti")
+
+	tra texture: essendo semplici indici, trovata una soluzione, per 2 texture t,s basta scambiare tutte le IT[]=t con quelle IT[]=s per avere una soluzione equivalente;
+	nel romperla: si riduce a 1/(N!) l'elenco delle soluzioni (N è il numero di texture utilizzate) (togliendo quindi (N!-1)/(N!) soluzioni "ridondanti!" )
+
+	tra immagini simili (uguali): se hanno width e heigth uguali, basta scambiarle di posto per avere una soluzione identica;
 
 simmetria nel "quale" texture usare (---> la più piccola? (indice? spazio libero?))--> t è solo un n° !!!

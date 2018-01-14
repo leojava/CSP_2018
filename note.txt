@@ -46,5 +46,8 @@ first-fail principle
 
 Choose a variable that is likely to cause a fail, choose a value that is likely to be feasible
 
-Choose variables and values that are likely tipoyield high-quality solutions
+Choose variables and values that are likely to yield high-quality solutions
 
+
+
+simmetrie sulle variabili -> relazioni d'ordine

@@ -1,8 +1,8 @@
 {
-  "//cose":"" ,
+  "//" : "informazioni: ",
+  "//" : "in images, ogni oggetto è una immagine in cui definire w (:width) e h (height) ",
   "images" : [
-    { "id": "optional",
-      "w":  1, "h":  1 },
+    { "w":  1, "h":  1 },
     { "w":  2, "h":  2 },
     { "w":  1, "h":  2 },
     { "w":  5, "h":  2 },
@@ -15,17 +15,25 @@
     { "w":  3, "h":  6 }
   ],
   "options" : {
-  	"//weight: 0<x<10000" : "",
+    "//" : "informazioni: " ,
+    "//" : "*Weights sono i pesi per la funzione obiettivo, spaceWeight è il peso dello <spazio libero>",
+    "//" : "  mentre numberWeight del <n° di texture>; i pesi dovrebbero essere compresi in [0;10000]",
+    "//" : "textures sono le opzioni riguardanti le texture. ",
     "spaceWeight": 1,
     "numberWeight": 10,
-
     "textures" : {
-      "//if defined, N : const" : "",
-      "//number": 4,
-      "maxNumber": 4,
-      "dimsPowOf2": true,
-      "sameDimsForAll" : true,
-      "squared" : false
+      "//" : "informazioni:",
+      "//" : "number definisce se il n° di texture dev'essere costante; dev'essere in [1;len(images)]",
+      "//" : "maxNumber, al contrario, definisce un massimo; dev'essere in [i;len(images)]",
+      "//" : "dimsPowOf2, booleano, dice se le dimensioni debbano essere solo multipli di 2",
+      "//" : "sameDimsForAll [non ancora implementato], booleano, dice se tutte le texturer ",
+      "//" : "  debbano avere le stesse dimesioni (es: 4 texture, tutte con width=59, height=45)",
+      "//" : "squared, booleano, indica se le textures debbano essere quadrate (width=height)",
+      "number": 2,
+      "maxNumber": 2,
+      "dimsPowOf2": false,
+      "sameDimsForAll" : false,
+      "squared" : true
     },
 
     "//rotationAllowed" : false
