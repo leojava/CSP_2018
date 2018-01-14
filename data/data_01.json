@@ -19,8 +19,10 @@
     "//" : "*Weights sono i pesi per la funzione obiettivo, spaceWeight è il peso dello <spazio libero>",
     "//" : "  mentre numberWeight del <n° di texture>; i pesi dovrebbero essere compresi in [0;10000]",
     "//" : "textures sono le opzioni riguardanti le texture. ",
+    "//" : "bleeding, se true, aggiunge 2 pixel alle dimensioni di ogni immagine",
     "spaceWeight": 1,
     "numberWeight": 10,
+    "bleeding" : true,
     "textures" : {
       "//" : "informazioni:",
       "//" : "number definisce se il n° di texture dev'essere costante; dev'essere in [1;len(images)]",
@@ -29,8 +31,8 @@
       "//" : "sameDimsForAll [non ancora implementato], booleano, dice se tutte le texturer ",
       "//" : "  debbano avere le stesse dimesioni (es: 4 texture, tutte con width=59, height=45)",
       "//" : "squared, booleano, indica se le textures debbano essere quadrate (width=height)",
-      "number": 2,
-      "maxNumber": 2,
+      "number": 3,
+      "//maxNumber": 3,
       "dimsPowOf2": false,
       "sameDimsForAll" : false,
       "squared" : true

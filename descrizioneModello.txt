@@ -71,14 +71,20 @@ volendo il modello si può espandere con delle funzionalità opzionali
 
 
 simmetrie:
-	tra img X img : sul vincolo di non sovrapposizione, basta farlo per le sole i<j
+	(a) tra img X img : sul vincolo di non sovrapposizione, basta farlo per le sole i<j
 
-	simmetria "nella" texture: una soluzione può essere specchiata verticalmente e orizzontalmente
+	(1,2) simmetria "nella" texture: una soluzione può essere specchiata verticalmente e orizzontalmente
 	nel romperla: si riduce a 1/4 l'insieme delle soluzioni (togliendo 3/4 di soluzioni "ridondanti")
+	possible soluzione: imporre come prime (X e Y minori) le immagini di dimensione (area o lato?) maggiore 
+		problema: come dimostrarne la validità? potrebbe togliere possibli soluzioni?
+		( (SE andasse bene:)  per ogni i,j in I,i<j: IT[i]=IT[j] => ( IW[j]*IH[i]> IW[j]*IH[j] =>  (IX[i]<=IX[j] ^ IX[i]<=IY[j])) )
+		(                                         stessa texture => (   area maggiore          =>         NON viene dopo) )       
 
-	tra texture: essendo semplici indici, trovata una soluzione, per 2 texture t,s basta scambiare tutte le IT[]=t con quelle IT[]=s per avere una soluzione equivalente;
+	(3) tra texture: essendo semplici indici, trovata una soluzione, per 2 texture t,s basta scambiare tutte le IT[]=t con quelle IT[]=s per avere una soluzione equivalente;
 	nel romperla: si riduce a 1/(N!) l'elenco delle soluzioni (N è il numero di texture utilizzate) (togliendo quindi (N!-1)/(N!) soluzioni "ridondanti!" )
+	soluzione (come implementarla?): per ogni immagine i, per ogni textures t,s, t<s: se in entrambe c'è un rettangolo libero per posizionare i, allora IT[i]!=s (: non si usa l'ultima, va bene in caso ci sia spazio su più di 2 texture)
 
-	tra immagini simili (uguali): se hanno width e heigth uguali, basta scambiarle di posto per avere una soluzione identica;
+	(4 (e forse 5)) tra immagini simili (uguali): se hanno width e heigth uguali, basta scambiarle di posto per avere una soluzione identica;
+	soluzione: le immagini uguali seguono l'ordine dei propri indici
+	(miglioria (?): basta farlo sulle singole dimensioni o sull'intera tupla?)
 
-simmetria nel "quale" texture usare (---> la più piccola? (indice? spazio libero?))--> t è solo un n° !!!

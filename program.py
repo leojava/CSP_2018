@@ -59,7 +59,7 @@ def pMain ():
 	# Signature: IntVar(<min>, <max>, [<name>])
 	# Alternative signature: IntVar(<domain as a list>, [<name>])
 	delComments(data);
-	print(json.dumps(data, indent=2));
+#	print(json.dumps(data, indent=2));
 
 	images = data['images']		# HAS to exist
 	options = data['options']	# HAS to exist
@@ -74,10 +74,11 @@ def pMain ():
 	#il massimo N è maxNumber oppure number oppure constM (len(images))
 	constMaxN = clamp(int(textureOptions.get('number', textureOptions.get('maxNumber', constM))), 1, constM)
 
+	constBleeding = 2 if options.get('bleeding', False) else 0
 	setI = range(constM)
 	setT = range(constMaxN)
-	paramsW = [ img['w'] for i,img in enumerate(images) ]
-	paramsH = [ img['h'] for i,img in enumerate(images) ]
+	paramsW = [ img['w']+constBleeding for i,img in enumerate(images) ]
+	paramsH = [ img['h']+constBleeding for i,img in enumerate(images) ]
 	paramAlfa = int(options.get('spaceWeight', defaultWeight));
 	paramBeta = int(options.get('numberWeight', defaultWeight));
 	if(paramAlfa*paramBeta == 0) :
@@ -102,7 +103,6 @@ def pMain ():
 	#maxInt = slv.IntVar([ constMaxInt ], 'maxInt')
 
 
-	'''va trovato maxTW e maxTH !!!'''
 
 	# N: se number -> numero fisso; altrimenti maxNumber se presente o constM (UB)
 	#N = getNVar('number' in textureOptions, constMaxN, (textureOptions.get('maxNumber', constM)));
@@ -144,7 +144,8 @@ def pMain ():
 
 	for t in setT:
 		# for each t: if t>=N => tw=0 ^ th=0		(if not used, each dimension IS 0)
-		slv.Add( ( T[t] >=N ) <= ( (TW[t]==0)*(TH[t]==0) ))
+		slv.Add( ( T[t] >=N ) <= ( (TW[t]==0)*(TH[t]==0) ))		# le immagini non utilizzate hanno area=0
+		slv.Add( ( T[t] < N ) <= (  TW[t]*TH[t] >0 ))			# le immagini utilizzate hanno area >=1
 
 		# for each t: TW[t] = Max IX[i]+IW[i] for each i, if IT[i]==t 
 		slv.Add( TW[t] == slv.Max( [ (IT[i]==t)*(IX[i]+IW[i]) for i in setI] ))
@@ -159,8 +160,9 @@ def pMain ():
 		for j in setI:
 			if i<j:	# i!=j; i<j breaks symmetries! :)
 												# < oppure <= ????  (se t=t, almeno un asse non deve sovrapporsi: uno dei due inisce prima dell'altro)
-				slv.Add( (IT[i]==IT[j]) <= ( slv.Max( [	(IX[i]+IW[i] < IX[j] ) , ( IX[j]+IW[j] < IX[i])	,
-														(IY[i]+IH[i] < IY[j] ) , ( IY[j]+IH[j] < IY[i])	]	) ) )
+												#prima era < (aggiungeva un'unita di spazio tra ogni immagine)
+				slv.Add( (IT[i]==IT[j]) <= ( slv.Max( [	(IX[i]+IW[i] <= IX[j] ) , ( IX[j]+IW[j] <= IX[i])	,
+														(IY[i]+IH[i] <= IY[j] ) , ( IY[j]+IH[j] <= IY[i])	]	) ) )
 				# togliamo un po' di simmetrie sulle immagini identiche
 				if(paramsH[i]==paramsH[j] and paramsW[i]==paramsW[j]):
 					slv.Add( (IT[i]== IT[j] ) <= ((IX[i]<=IX[j])*(IY[i]<=IY[j])) )	# stessa texture => i prima di j su XY
