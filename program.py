@@ -29,6 +29,7 @@ def delComments( d ):
 
 def pMain ():
 
+	inFile = sys.argv[1] if len(sys.argv) > 1 else '';
 
 	if len(sys.argv) <2:
 		data = json.load(sys.stdin) # read and parse JSON data
@@ -64,6 +65,10 @@ def pMain ():
 	images = data['images']		# HAS to exist
 	options = data['options']	# HAS to exist
 	textureOptions = options['textures'];
+	#if 'number' in textureOptions and 'maxNumber' in textureOptions:
+	#	if int(textureOptions['maxNumber']) < int(textureOptions['number']):
+	#		textureOptions['maxNumber']=textureOptions['number']
+
 	print('options:', options);
 
 
@@ -139,8 +144,6 @@ def pMain ():
 	slv.Add( ST == slv.Sum([TW[t]*TH[t] for t in setT]))
 
 	slv.Add( N == slv.Max([IT[i] for i in setI])+1)
-	#for i in setI:
-#		slv.Add( IT[i] < N)
 
 	for t in setT:
 		# for each t: if t>=N => tw=0 ^ th=0		(if not used, each dimension IS 0)
@@ -153,6 +156,11 @@ def pMain ():
 		# if options->squared textures 
 		if(textureOptions.get('squared', False) == True):	
 			slv.Add(TW[t] == TH[t])
+
+		#for s in setT:
+		#	if(t<s):
+		#		slv.Add( TW[t]>=TW[s])
+		#		slv.Add( TH[t]>=TH[s])
 
 
 
@@ -168,46 +176,26 @@ def pMain ():
 					slv.Add( (IT[i]== IT[j] ) <= ((IX[i]<=IX[j])*(IY[i]<=IY[j])) )	# stessa texture => i prima di j su XY
 					slv.Add( IT[i] <= IT[j] ) 	#texture diversa => i prima di j su T
 
-	#optional constraints
-	#squared textures
-	#if options.get('squaredTextures', False) == True: 
-	#	for t in setT:
-	#		slv.Add(TW[t] == TH[t])
-
 	#
 	# DEFINE THE SEARCH STRATEGY
 	# we will keep this fixed for a few more lectures
-	#
-	#all_vars = [x1, x2, x3]
-	all_vars = (
-		#I + T +
-	  IT + IX + IY + TW + TH + [ f, L, N, ST, ]) 
+	all_vars = ( IT + IX + IY + TW + TH + [ f, L, N, ST, ]) 
 	#DFS (?) Depth First Search
 	#decision_builder = slv.Phase(all_vars, slv.INT_VAR_DEFAULT, slv.INT_VALUE_DEFAULT)
 
 
-	'''	slv.CHOOSE_FIRST_UNBOUND
-		slv.CHOOSE_RANDOM
-		slv.CHOOSE_MIN_SIZE_LOWEST_MIN
-		slv.CHOOSE_MIN_SIZE_HIGHEST_MIN
-		slv.CHOOSE_MIN_SIZE_LOWEST_MAX
-		slv.CHOOSE_MIN_SIZE_HIGHEST_MAX
-		slv.CHOOSE_LOWEST_MIN
-		slv.CHOOSE_HIGHEST_MAX
-		slv.CHOOSE_MIN_SIZE
-		slv.CHOOSE_MAX_SIZE
+	'''	slv.CHOOSE_FIRST_UNBOUND			slv.CHOOSE_RANDOM
+		slv.CHOOSE_MIN_SIZE_LOWEST_MIN		slv.CHOOSE_MIN_SIZE_HIGHEST_MIN
+		slv.CHOOSE_MIN_SIZE_LOWEST_MAX		slv.CHOOSE_MIN_SIZE_HIGHEST_MAX
+		slv.CHOOSE_LOWEST_MIN				slv.CHOOSE_HIGHEST_MAX
+		slv.CHOOSE_MIN_SIZE					slv.CHOOSE_MAX_SIZE
 		slv.CHOOSE_MAX_REGRET_ON_MIN	'''
 
+	'''	slv.ASSIGN_MIN_VALUE		slv.ASSIGN_MAX_VALUE
+		slv.ASSIGN_RANDOM_VALUE		slv.ASSIGN_CENTER_VALUE
+		slv.SPLIT_LOWER_HALF		slv.SPLIT_UPPER_HALF	'''
 
-	'''	slv.ASSIGN_MIN_VALUE
-		slv.ASSIGN_MAX_VALUE
-		slv.ASSIGN_RANDOM_VALUE
-		slv.ASSIGN_CENTER_VALUE
-		slv.SPLIT_LOWER_HALF
-		slv.SPLIT_UPPER_HALF	'''
-
-
-
+	#decision_builder = slv.Phase(all_vars, slv.INT_VAR_DEFAULT, slv.INT_VALUE_DEFAULT)
 	#decision_builder = slv.Phase(all_vars, slv.CHOOSE_MAX_REGRET_ON_MIN, slv.SPLIT_LOWER_HALF)
 	#decision_builder = slv.Phase(all_vars, slv.CHOOSE_MAX_REGRET_ON_MIN, slv.SPLIT_UPPER_HALF)
 	decision_builder = slv.Phase(all_vars, slv.CHOOSE_MIN_SIZE_HIGHEST_MAX, slv.ASSIGN_CENTER_VALUE)
@@ -226,6 +214,8 @@ def pMain ():
 	slv.NewSearch(decision_builder ,search_monitors)
 
 
+	def getSolStat(count, slv):
+		return (count, slv.Branches(),	slv.Failures(), slv.WallTime());
 
 	#if slv.solutions() :
 	print("ALL variables: ", all_vars)	
@@ -234,12 +224,13 @@ def pMain ():
 	# Enumerate all solutions!
 	#
 	count=0
+	outBaseFile = inFile
 	while slv.NextSolution():
 		# Here, a solution has just been found. Hence, all variables are bound
 		# and their "Value()" method can be called without errors.
 		# The notation %2d prints an integer using always two "spaces"
 		#print ('x1: %2d, x2: %2d, x3: %2d' % (x1.Value(), x2.Value(), x3.Value()) )
-		if(count%1000==0 or 1):
+		if True: #if(count%1000==0 or 1):
 			sol = '';
 			print()
 			print('solution %d: ' % count)
@@ -255,20 +246,16 @@ def pMain ():
 			sol+=str(N.Value())+'\n'
 			def getVal(x): return str(x.Value());
 			sol+='\n'.join( '%d,%d' % (TW[t].Value(),TW[t].Value()) for t in setT)+'\n'
-			#sol+=','.join(map(getVal, TW ))+'\n'
-			#sol+=','.join(map(getVal, TH ))+'\n'
 			sol+=str(constM)+'\n';
 			sol+='\n'.join( '%d,%d,%d,%d,%d'% (IT[i].Value(),IX[i].Value(),IY[i].Value(),IW[i],IH[i]) for i in setI)+'\n'
-			#sol+=','.join(map(getVal, IT ))+'\n'
-			#sol+=','.join(map(getVal, IX ))+'\n'
-			#sol+=','.join(map(getVal, IY ))+'\n'
-			#sol+=','.join(map(getVal, IW ))+'\n'
-			#sol+=','.join(map(str, IW))+'\n'
-			#sol+=','.join(map(getVal, IH ))+'\n'
-			#sol+=','.join(map(str, IH))+'\n'
 			print('sol:{\n%s}\n' %sol)
-			with open((sys.argv[1] if len(sys.argv)>1 else '')+".out", "w") as text_file:
+			with open(outBaseFile+".sol", "w") as text_file:
 			    print('%s' % sol, file=text_file)
+			if count==0:
+				firstSol = getSolStat(count, slv)
+				lastSol = firstSol
+			else:
+				lastSol = getSolStat(count, slv)
 		count+=1
 
 	print()
@@ -278,6 +265,10 @@ def pMain ():
 	#
 	slv.EndSearch()
 
+	with open(inFile+'.out', 'w') as text_file:
+		print('firstSol:%d;branches:%d;failures:%d;time:%d' % firstSol, file=text_file)
+		print('lastSol:%d;branches:%d;failures:%d;time:%d' % lastSol, file=text_file)
+		print('totSols:%d;branches:%d;failures:%d;time:%d' % getSolStat(count, slv) , file=text_file)
 
 	print('Total Solutions: %d\nBranches: %d\n Failures: %d\n wall_time: %d' % ( count, slv.Branches(),	slv.Failures(), slv.WallTime()))
 
