@@ -44,8 +44,8 @@ def pMain ():
 	slv = pywrapcp.Solver('simple-example')
 
 	def getNVar( N: int, constMaxN: int):
-		if(N>0):	N = slv.IntVar([N], 'N')
-		else:			N = slv.IntVar(1, constMaxN, 'N')		# 1<=N<=M
+		if(N>0 and N<=constMaxN):	N = slv.IntVar([N], 'N')
+		else:						N = slv.IntVar(1, constMaxN, 'N')		# 1<=N<=M
 		return N;
 
 	# 0 vorrebbe dire che l'immagine NON ha area!
@@ -111,7 +111,7 @@ def pMain ():
 
 	# N: se number -> numero fisso; altrimenti maxNumber se presente o constM (UB)
 	#N = getNVar('number' in textureOptions, constMaxN, (textureOptions.get('maxNumber', constM)));
-	N = getNVar(clamp(int(textureOptions.get('number', 0)), 1, constMaxN), constMaxN);
+	N = getNVar(int(textureOptions.get('number', 0)), constMaxN);
 
 	# al massimo 1 texture per image => 0<=id<=M-1
 	IT = [slv.IntVar(0, constMaxN-1, 'IT%d' % i) for i in setI]
@@ -225,6 +225,8 @@ def pMain ():
 	#
 	count=0
 	outBaseFile = inFile
+	firstSol = (-1,0,0,slv.WallTime())
+	lastSol = firstSol
 	while slv.NextSolution():
 		# Here, a solution has just been found. Hence, all variables are bound
 		# and their "Value()" method can be called without errors.

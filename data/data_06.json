@@ -16,6 +16,7 @@
       "number": 4,
       "dimsPowOf2": true,
       "sameDimsForAll" : false,
-      "squared" : false,
-    },
+      "squared" : false
+    }
+  }
 }

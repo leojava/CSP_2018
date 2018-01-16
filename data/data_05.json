@@ -14,6 +14,7 @@
       "maxNumber": 3,
       "dimsPowOf2": true,
       "sameDimsForAll" : false,
-      "squared" : false,
-    },
+      "squared" : false
+    }
+  }
 }
