@@ -22,7 +22,7 @@
     "//" : "bleeding, se true, aggiunge 2 pixel alle dimensioni di ogni immagine",
     "spaceWeight": 1,
     "numberWeight": 10,
-    "bleeding" : true,
+    "bleeding" : false,
     "textures" : {
       "//" : "informazioni:",
       "//" : "number definisce se il n° di texture dev'essere costante; dev'essere in [1;len(images)]",
@@ -33,9 +33,12 @@
       "//" : "squared, booleano, indica se le textures debbano essere quadrate (width=height)",
       "number": 3,
       "//maxNumber": 3,
-      "dimsPowOf2": false,
+      "dimsPowOf2": true,
       "sameDimsForAll" : false,
-      "squared" : true
+      "squared" : false,
+      "//" : "[non implementato] potrebbe (?) togliere alcune sol valide, ma probabilmente esiste un ottimo",
+      "//" : " (o quasi) che permetta di infischiarsene",
+      "pseudoGreedyBiggerFirst": true
     },
 
     "//rotationAllowed" : false

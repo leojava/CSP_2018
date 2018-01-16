@@ -1,31 +1,19 @@
 {
-  "//cose":"" ,
   "images" : [
-    {
-      "id": "optional",
-      "w": 50,
-      "h": 50
-    },
-    {
-      "w": 50,
-      "h": 50
-    }
+    { "w": 12, "h": 12 },
+    { "w":  1, "h": 12 },
+    { "w": 11, "h":  2 },
+    { "w":  8, "h": 10 },
+    { "w":  2, "h":  6 }
   ],
   "options" : {
-    "spaceWeight": 1.0,
-    "numberWeight": 1.0,
-    "rotationAllowed" : false,
-    "powOf2Only": true,
-    "oneWidthHeightForTextures" : true,
-    "squaredTextures" : false
-  },
-  "// fixedImages viene poi clashato con images" : "",
-  "fixedImages" : [
-    {
-      "id": "optional1",
-      "t" : 0,
-      "x" : 0,
-      "y" : 0
-    }
-  ]
+    "spaceWeight": 1,
+    "numberWeight": 10,
+    "bleeding" : false,
+    "textures" : {
+      "maxNumber": 3,
+      "dimsPowOf2": true,
+      "sameDimsForAll" : false,
+      "squared" : false,
+    },
 }
