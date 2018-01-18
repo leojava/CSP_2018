@@ -13,9 +13,9 @@
     "numberWeight": 10,
     "bleeding" : false,
     "textures" : {
-      "//number": 3,
-      "maxNumber" : 4,
-      "//dimsPowOf2": true,
+      "number": 2,
+      "//maxNumber" : 3,
+      "dimsPowOf2": true,
       "//sameDimsForAll" : false,
       "//squared" : true
     }

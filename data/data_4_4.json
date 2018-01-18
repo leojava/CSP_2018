@@ -11,7 +11,7 @@
   "options" : {
     "spaceWeight": 1,
     "numberWeight": 10,
-    "bleeding" : true,
+    "bleeding" : false,
     "textures" : {
       "//number": 3,
       "maxNumber" : 4,
