@@ -2,10 +2,8 @@
   "images" : [
     { "w": 11, "h": 12 },
     { "w":  7, "h":  1 },
-    { "w":  6, "h": 10 },
-    { "w": 10, "h":  5 },
-    { "w":  7, "h":  2 },
-    { "w": 10, "h":  1 },
+    { "f":{ "w": 10, "h":  5 }, "w":  6, "h": 10 },
+    
     { "w":  5, "h": 11 },
     { "w":  3, "h":  8 },
     { "w":  7, "h":  6 },
@@ -16,10 +14,10 @@
     "numberWeight": 10,
     "bleeding" : false,
     "textures" : {
-      "maxNumber": 2,
-      "dimsPowOf2": true,
+      "number": 3,
+      "//dimsPowOf2": true,
       "sameDimsForAll" : false,
-      "squared" : false
+      "squared" : true
     }
   }
 }

@@ -51,7 +51,7 @@ def pMain ():
 	# 0 vorrebbe dire che l'immagine NON ha area!
 	def getTextureDims(maxDimension: int, name: str, powOf2: bool, setT):
 		if(powOf2):
-			pows = [2**i for i in range(math.ceil(math.log2(maxDimension)))]	# da 2**0 a 2**N
+			pows = [2**i for i in range(math.ceil(math.log2(maxDimension))+1)]	# da 2**0 a 2**N
 			dims = [slv.IntVar(pows, '%s%d' % (name,t)) for t in setT]
 		else:	dims = [slv.IntVar(0, maxDimension, '%s%d' % (name,t)) for t in setT]
 		return dims;
@@ -86,7 +86,7 @@ def pMain ():
 	paramsH = [ img['h']+constBleeding for i,img in enumerate(images) ]
 	paramAlfa = int(options.get('spaceWeight', defaultWeight));
 	paramBeta = int(options.get('numberWeight', defaultWeight));
-	if(paramAlfa*paramBeta == 0) :
+	if(paramAlfa*paramBeta == 0 and paramBeta==paramAlfa) :
 		paramAlfa=paramBeta=1;
 		print('errore nei pesi!')
 	constSU = sum(paramsW[i]*paramsH[i] for i in setI);
@@ -156,6 +156,9 @@ def pMain ():
 		# if options->squared textures 
 		if(textureOptions.get('squared', False) == True):	
 			slv.Add(TW[t] == TH[t])
+		#if textureOptions.get('sameDimsForAll', False) == True:
+		#	if T[t] != T[0]:
+		#		slv.Add(1 == (TW[t] == TW[0]) * (TH[t] == TH[0]) )
 
 		#for s in setT:
 		#	if(t<s):
@@ -201,8 +204,10 @@ def pMain ():
 	decision_builder = slv.Phase(all_vars, slv.CHOOSE_MIN_SIZE_HIGHEST_MAX, slv.ASSIGN_CENTER_VALUE)
 
 
-	m1 = slv.SearchLog(4*1000*1000) #num_branches
-	m2 = None#slv.TimeLimit(    60*1000) #time_limit [milliseconds]
+	m1 = slv.SearchLog(5*1000*1000) #num_branches
+	maxTime = int(options.get('maxTime', 0))
+
+	m2 = slv.TimeLimit(maxTime * 1000) if(maxTime>1) else None  #time_limit [milliseconds]
 	m3 = slv.Minimize(f, 1)				#  constraint: z <= zbest-step
 	# cost function as constraint on variable
 	search_monitors = [m1, m2, m3]
@@ -231,7 +236,6 @@ def pMain ():
 		# Here, a solution has just been found. Hence, all variables are bound
 		# and their "Value()" method can be called without errors.
 		# The notation %2d prints an integer using always two "spaces"
-		#print ('x1: %2d, x2: %2d, x3: %2d' % (x1.Value(), x2.Value(), x3.Value()) )
 		if True: #if(count%1000==0 or 1):
 			sol = '';
 			print()
@@ -247,9 +251,9 @@ def pMain ():
 				print('I %d : in t%d at %d,%d [%d x %d]' % (i, IT[i].Value(), IX[i].Value(), IY[i].Value(), IW[i], IH[i]))
 			sol+=str(N.Value())+'\n'
 			def getVal(x): return str(x.Value());
-			sol+='\n'.join( '%d,%d' % (TW[t].Value(),TW[t].Value()) for t in setT)+'\n'
+			sol+='\n'.join( '%dx%d' % (TW[t].Value(),TH[t].Value()) for t in setT)+'\n'
 			sol+=str(constM)+'\n';
-			sol+='\n'.join( '%d,%d,%d,%d,%d'% (IT[i].Value(),IX[i].Value(),IY[i].Value(),IW[i],IH[i]) for i in setI)+'\n'
+			sol+='\n'.join( '%d,%d,%d,%dx%d'% (IT[i].Value(),IX[i].Value(),IY[i].Value(),IW[i],IH[i]) for i in setI)+'\n'
 			print('sol:{\n%s}\n' %sol)
 			with open(outBaseFile+".sol", "w") as text_file:
 			    print('%s' % sol, file=text_file)
