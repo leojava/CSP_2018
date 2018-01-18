@@ -18,7 +18,7 @@
     "textures" : {
       "//number": 3,
       "maxNumber": 4,
-      "//dimsPowOf2": true,
+      "dimsPowOf2": true,
       "//sameDimsForAll" : true,
       "//squared" : true
     }

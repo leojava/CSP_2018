@@ -20,7 +20,7 @@
       "maxNumber": 4,
       "//dimsPowOf2": true,
       "//sameDimsForAll" : true,
-      "//squared" : true
+      "squared" : true
     }
   }
 }

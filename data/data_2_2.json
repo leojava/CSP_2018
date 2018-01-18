@@ -16,11 +16,11 @@
     "bleeding" : false,
     "//maxTime" : 60,
     "textures" : {
-      "//number": 3,
-      "maxNumber": 4,
+      "number": 3,
+      "//maxNumber": 4,
       "//dimsPowOf2": true,
       "//sameDimsForAll" : true,
-      "//squared" : true
+      "squared" : true
     }
   }
 }
