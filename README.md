@@ -13,6 +13,7 @@ http://www.lia.disi.unibo.it/Staff/MicheleLombardi/SV1617/lectures/lab1.html#/30
 
 # Global Constraint Catalog
 http://sofdem.github.io/gccat/gccat/sec5.html
+https://github.com/sofdem/gccat
 
 # alcuni tutorial su or-tools
 https://drive.google.com/drive/u/0/folders/0B2yUSpEp04BNUTgwNVRkU0lXcUE
